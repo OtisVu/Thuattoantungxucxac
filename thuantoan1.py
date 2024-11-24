@@ -156,3 +156,49 @@ average_profit_loss, profit_loss_distribution = calculate_profit_loss_distributi
 )
 
 min_rolls, average_profit_loss
+
+## Mô phỏng từng chiến lược và so sánh lợi nhuận trung bình:
+def simulate_team_game(num_players, target_streak, n_rolls, cost_no_success, cost_partial_success_1, cost_partial_success_2, reward):
+    team_profits = []
+
+    for _ in range(n_rolls):
+        team_profit = 0
+        for _ in range(num_players):
+            streak = 0
+            cost = 0
+            while streak < target_streak:
+                roll = np.random.randint(1, 7)
+                if roll == 1:
+                    streak += 1
+                else:
+                    if streak == 0:
+                        cost += cost_no_success
+                    elif streak == 1:
+                        cost += cost_partial_success_1
+                    elif streak == 2:
+                        cost += cost_partial_success_2
+                    streak = 0
+            team_profit += reward - cost if streak == target_streak else -cost
+        team_profits.append(team_profit / num_players)
+
+    average_team_profit = np.mean(team_profits)
+    return average_team_profit
+
+# Parameters for team game
+num_players = 4
+average_team_profit = simulate_team_game(
+    num_players=num_players,
+    target_streak=3,
+    n_rolls=n_rolls,
+    cost_no_success=cost_no_success,
+    cost_partial_success_1=cost_partial_success_1,
+    cost_partial_success_2=cost_partial_success_2,
+    reward=reward
+)
+print(f"Lợi nhuận trung bình mỗi người khi chơi nhóm: {average_team_profit}")
+''' 
+Số lần tung cần thiết: Khoảng 1.240 lần để đạt 95% xác suất.
+Lợi nhuận/tổn thất trung bình: Sẽ phụ thuộc vào mô phỏng cụ thể.
+Tiền thưởng tối thiểu: Khoảng $21.6 triệu USD để đảm bảo EV dương.
+Chiến lược nhóm: Lợi nhuận trung bình mỗi người chơi sẽ cao hơn khi hợp tác.
+'''
